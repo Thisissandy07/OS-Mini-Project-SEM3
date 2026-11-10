@@ -1,0 +1,6 @@
+build/
+campuscompute
+logs/*.log
+*.o
+*.pdf
+*.zip
