@@ -14,8 +14,9 @@ typedef struct {
 
 int banker_load_file(const char *path, banker_t *b);
 void banker_compute_need(banker_t *b);
-int banker_is_safe(const banker_t *b, int *safe_seq);
+int banker_is_safe(const banker_t *b, int *safe_seq, int *seq_len, int verbose);
 void banker_print(const banker_t *b);
+int banker_analyze_file(const char *path, int *is_safe);
 int banker_cmd(int argc, char **argv);
 
 #endif

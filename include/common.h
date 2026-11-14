@@ -6,7 +6,7 @@
 #include <string.h>
 
 #define MAX_JOBS 32
-#define MAX_SLOTS 256
+#define MAX_SLOTS 1024
 #define MAX_PROCS 16
 #define MAX_RES 8
 #define DEFAULT_QUANTUM 2

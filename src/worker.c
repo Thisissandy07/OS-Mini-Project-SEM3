@@ -46,6 +46,7 @@ int worker_run(int simulate_failure)
     int ok = 0;
     int failed = 0;
     int status;
+    int expected_failed = simulate_failure ? 2 : 0;
     const char *tag = simulate_failure ? " (simulated)" : "";
 
     printf("[parent pid %d] starting %d workers%s\n", getpid(), NUM_WORKERS,
@@ -99,7 +100,8 @@ int worker_run(int simulate_failure)
     printf("[parent] summary: %d started, %d completed normally, %d failed\n", started, ok, failed);
     if (waitpid(-1, &status, WNOHANG) < 0 && errno == ECHILD)
         printf("[parent] no child processes remaining, all reaped\n");
-    return started == NUM_WORKERS ? 0 : -1;
+    return (started == NUM_WORKERS && reaped == started && failed == expected_failed &&
+            ok == NUM_WORKERS - expected_failed) ? 0 : -1;
 }
 
 int worker_cmd(int argc, char **argv)

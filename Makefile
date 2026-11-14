@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=gnu11 -Iinclude -g
+CFLAGS = -Wall -Wextra -std=gnu11 -Iinclude -g -MMD -MP
 LDFLAGS = -pthread -lrt
 SRC = $(wildcard src/*.c)
 OBJ = $(SRC:src/%.c=build/%.o)
@@ -16,7 +16,12 @@ build/%.o: src/%.c | build
 build:
 	mkdir -p build
 
+test: all
+	sh tests/run_tests.sh
+
 clean:
 	rm -rf build $(BIN) logs/*.log
 
-.PHONY: all clean
+-include $(OBJ:.o=.d)
+
+.PHONY: all test clean

@@ -5,6 +5,7 @@
 
 int ipc_run_demo(void);
 int ipc_cleanup(void);
+int ipc_resources_present(void);
 int ipc_cmd(int argc, char **argv);
 
 #endif

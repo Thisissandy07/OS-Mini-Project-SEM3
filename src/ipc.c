@@ -96,16 +96,18 @@ static int producer_process(void)
     return 0;
 }
 
-static void verify_released(void)
+static int verify_released(void)
 {
     int fd;
     int err;
+    int leftovers = 0;
     sem_t *s;
 
     fd = shm_open(SHM_NAME, O_RDONLY, 0);
     err = errno;
     if (fd >= 0) {
         close(fd);
+        leftovers++;
         printf("verify: %s still exists\n", SHM_NAME);
     } else if (err == ENOENT) {
         printf("verify: %s no longer exists\n", SHM_NAME);
@@ -117,12 +119,32 @@ static void verify_released(void)
     err = errno;
     if (s != SEM_FAILED) {
         sem_close(s);
+        leftovers++;
         printf("verify: %s still exists\n", SEM_NAME);
     } else if (err == ENOENT) {
         printf("verify: %s no longer exists\n", SEM_NAME);
     } else {
         printf("verify: %s check failed: %s\n", SEM_NAME, strerror(err));
     }
+    return leftovers;
+}
+
+int ipc_resources_present(void)
+{
+    int found = 0;
+    int fd = shm_open(SHM_NAME, O_RDONLY, 0);
+    sem_t *s;
+
+    if (fd >= 0) {
+        close(fd);
+        found++;
+    }
+    s = sem_open(SEM_NAME, 0);
+    if (s != SEM_FAILED) {
+        sem_close(s);
+        found++;
+    }
+    return found;
 }
 
 int ipc_run_demo(void)
@@ -240,8 +262,8 @@ done:
         close(fd);
     if (shm_created && shm_unlink(SHM_NAME) == 0)
         printf("cleanup: shared memory %s unlinked\n", SHM_NAME);
-    if (shm_created || sem_created)
-        verify_released();
+    if ((shm_created || sem_created) && verify_released() != 0)
+        rc = -1;
     return rc;
 }
 
